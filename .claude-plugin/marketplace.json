@@ -1,0 +1,47 @@
+{
+  "name": "samzhu-agent-skills",
+  "owner": {
+    "name": "samzhu"
+  },
+  "metadata": {
+    "description": "Development workflow and creative tools skills for Claude Code",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "tdd",
+      "description": "Test-Driven Development with strict Red-Green-Refactor cycle",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/tdd"]
+    },
+    {
+      "name": "bdd",
+      "description": "Behavior-Driven Development: Discovery → Formulation → Automation",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/bdd"]
+    },
+    {
+      "name": "springboot-config-organizer",
+      "description": "Spring Boot configuration dual-layer profile design organizer",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/springboot-config-organizer"]
+    },
+    {
+      "name": "research",
+      "description": "Research development topics and produce structured tutorial documents",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/research"]
+    },
+    {
+      "name": "ui-craft",
+      "description": "Intentional UI design with craft quality, not defaults",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/ui-craft"]
+    }
+  ]
+}
