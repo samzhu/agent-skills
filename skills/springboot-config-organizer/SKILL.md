@@ -41,6 +41,10 @@ metadata:
    - `application-local.yaml` — 本地基礎設施（Docker Compose）
    - `application-gcp.yaml` — GCP 基礎設施（Secret Manager、Cloud SQL）
    - `config/application-dev.yaml` — 開發環境行為（DEBUG 日誌、引入 secrets）
+   - `config/application-lab.yaml` — Lab 環境行為
+   - `config/application-sit.yaml` — SIT 環境行為
+   - `config/application-uat.yaml` — UAT 環境行為
+   - `config/application-prod.yaml` — 正式環境行為（INFO 日誌、限縮 Actuator）
    - `config/application-secrets.properties` — 本機機敏值（不提交 Git）
 2. 建立統一屬性名稱對照表，使用 `{app}-{secret-name}` 格式
 
@@ -51,7 +55,7 @@ metadata:
 向用戶報告分析結果和建議的新結構，確認：
 1. 應用程式名稱前綴（統一屬性名稱用）
 2. 需要哪些基礎設施 profile（local、gcp、aws...）
-3. 需要哪些環境 profile（dev、sit、uat、prod...）
+3. 需要哪些環境 profile（dev, lab, sit, uat, prod...）
 
 **等待用戶確認後再執行。**
 
@@ -68,8 +72,9 @@ metadata:
      config:
        import: "optional:file:./config/application-secrets.properties"
    ```
-5. 建立 `config/application-secrets.properties.example`
-6. 更新 `.gitignore` — 排除 `config/application-secrets.properties`
+5. 依需求建立其他環境行為檔：`config/application-lab.yaml`, `config/application-sit.yaml`, `config/application-uat.yaml`, `config/application-prod.yaml`
+6. 建立 `config/application-secrets.properties.example`
+7. 更新 `.gitignore` — 排除 `config/application-secrets.properties`
 
 ### Step 5: 驗證
 

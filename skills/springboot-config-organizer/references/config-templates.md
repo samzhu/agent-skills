@@ -87,6 +87,28 @@ logging:
     com.example.myapp: DEBUG
 ```
 
+## config/application-prod.yaml（正式環境行為）
+
+```yaml
+# =============================================================================
+# 正式環境行為配置
+# =============================================================================
+# Profile: prod
+# 用途: 正式環境，INFO 日誌、限縮 Actuator endpoint
+# =============================================================================
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    root: INFO
+    com.example.myapp: INFO
+```
+
 ## config/application-secrets.properties.example
 
 ```properties
@@ -122,10 +144,15 @@ config/application-secrets.properties
 
 src/main/resources/
 ├── application.yaml          ← 基礎共用配置
-└── application-local.yaml    ← 本地基礎設施
+├── application-local.yaml    ← 本地基礎設施
+└── application-gcp.yaml      ← GCP 基礎設施
 
 config/
 ├── application-dev.yaml      ← 開發環境行為
+├── application-lab.yaml      ← Lab 環境行為
+├── application-sit.yaml      ← SIT 環境行為
+├── application-uat.yaml      ← UAT 環境行為
+├── application-prod.yaml     ← 正式環境行為
 └── application-secrets.properties.example  ← 範例檔
 
 ### 統一屬性名稱
@@ -144,6 +171,6 @@ cp config/application-secrets.properties.example config/application-secrets.prop
 
 ### 後續可擴展
 
-- 新增 application-gcp.yaml 支援 GCP
-- 新增 config/application-sit.yaml 支援 SIT 環境
+- 新增其他基礎設施 profile（aws 等）
+- 依需求調整各環境行為 profile 的日誌等級與 Actuator 設定
 ```
