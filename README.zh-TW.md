@@ -20,6 +20,7 @@ claude plugin install bdd@samzhu-agent-skills
 claude plugin install springboot-config-organizer@samzhu-agent-skills
 claude plugin install research@samzhu-agent-skills
 claude plugin install ui-craft@samzhu-agent-skills
+claude plugin install depx@samzhu-agent-skills
 ```
 
 ## Skills 清單
@@ -31,6 +32,7 @@ claude plugin install ui-craft@samzhu-agent-skills
 | **springboot-config-organizer** | Spring Boot 設定檔雙層 Profile 設計組織器 |
 | **research** | 研究開發主題並產出結構化教學文件 |
 | **ui-craft** | 刻意的 UI 設計，追求工藝品質而非預設值 |
+| **depx** | 探索 JVM 依賴套件原始碼，索引並反編譯 JAR 檔案 |
 
 ## 使用方式
 
@@ -63,6 +65,23 @@ claude plugin install ui-craft@samzhu-agent-skills
 觸發詞：`UI`、`介面設計`、`design system`、`craft`、`shadcn`
 
 引導刻意的 UI 設計決策，追求工藝品質 — 每個視覺選擇都應該是有意圖的。
+
+### Depx（依賴套件探索器）
+
+觸發詞：`dependency source`、`decompile`、`JAR`、`inspect class`、`library internals`、`查看依賴`、`反編譯`
+
+**為什麼需要這個 skill：** 在 JVM 專案中使用 Claude Code 時，查看第三方依賴的原始碼是很常見的需求 — 確認類別簽章、理解函式庫內部運作、或找到正確的 API 呼叫方式。沒有這個 skill 的話，Claude Code 會反覆執行 `find ~/.gradle/caches` 和 `javap` 指令，例如：
+
+```
+JAR=$(find ~/.gradle/caches -name "some-lib-0.10.0.jar" 2>/dev/null | head -1) \
+  && javap -p -classpath "$JAR" com.example.SomeClass
+```
+
+每一條指令都會觸發權限確認提示（「Command contains `$()` command substitution — Do you want to proceed?」），讓一次簡單的類別查詢變成反覆按確認的苦差事。單次調查可能就需要 5～10 次核准。
+
+Depx 的解法是一次性建立本地 `.depx/` 索引（manifest 檔案可透過 Grep 工具搜尋，不需要權限提示），並按需反編譯 JAR。初次設定完成後，大部分查詢**完全不需要 Bash 指令，也不會跳出任何權限提示**。
+
+索引 JVM 依賴套件的 JAR 檔案，可搜尋類別簽章或按需反編譯完整原始碼。支援 Gradle 與 Maven 專案。
 
 ## 範例
 
