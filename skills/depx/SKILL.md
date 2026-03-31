@@ -1,10 +1,10 @@
 ---
 name: depx
 description: >-
-  ALWAYS use instead of find/javap/jar tf/jar xf on ~/.gradle or ~/.m2 caches.
+  ALWAYS use instead of find/javap/jar tf/jar xf/unzip/cd on ~/.gradle or ~/.m2 caches.
   TRIGGER when: inspecting third-party JVM class/method/API, searching dependency JARs,
-  extracting or decompiling JAR contents, reading library internals, or class not in project src.
-  DO NOT TRIGGER for project source code in working directory.
+  extracting/decompiling/unzipping JAR or source JAR contents, reading library internals,
+  or class not in project src. DO NOT TRIGGER for project source code in working directory.
 allowed-tools: Bash, Read, Write, Glob, Grep
 metadata:
   author: samzhu
@@ -19,11 +19,13 @@ You are an AI agent that needs to explore JVM dependency source code. Follow the
 
 ## Priority Rules (NEVER violate)
 
-1. **NEVER** run `find ~/.gradle/caches`, `find ~/.m2`, `jar tf`, `jar xf`, `javap`, or any Bash command to scan, extract, or inspect local repository caches directly — these trigger repeated permission prompts and are slow. **NEVER** extract JARs to `/tmp` or any temporary directory. This applies to **ALL phases** including index building — use the build tool (Gradle/Maven) to resolve classpath, not `find`.
+1. **NEVER** run `find ~/.gradle/caches`, `find ~/.m2`, `jar tf`, `jar xf`, `javap`, `unzip`, or any Bash command to scan, extract, or inspect local repository caches directly — these trigger repeated permission prompts and are slow. **NEVER** `cd` into `~/.gradle/caches` or `~/.m2` directories. **NEVER** extract JARs or source JARs (`*-sources.jar`) to `/tmp` or any temporary directory. **NEVER** `unzip` source JARs to read library code. This applies to **ALL phases** including index building — use the build tool (Gradle/Maven) to resolve classpath, not `find`.
 2. **ALWAYS** check `.depx/manifest/` first using the Grep tool (no Bash needed, no permission prompt)
 3. **ALWAYS** check `.depx/source/` for decompiled code using the Read tool (no Bash needed)
-4. If `.depx/manifest/` does not exist or is empty → run the **Index Build** procedure below (which uses Gradle/Maven, NOT `find`)
+4. If `.depx/manifest/` does not exist, is empty, or **does not contain the class/library you need** → run the **Index Build** procedure below (which uses Gradle/Maven, NOT `find`). An outdated or incomplete index is NOT an excuse to fall back to `javap`/`find`/`jar` commands.
 5. If decompiled source is needed but missing → run the **Decompile** procedure below
+6. **There is NO fallback.** If the index doesn't have what you need, rebuild it. NEVER bypass this skill's procedures by running cache commands directly, even if the index is stale or incomplete.
+7. **NEVER delegate dependency lookups to Agent subagents (Explore, Plan, general-purpose).** Subagents do NOT have access to this skill's rules and will fall back to `find ~/.gradle/caches`. Always perform dependency inspection in the main conversation context where this skill is active.
 
 > **Why this matters:** Without this skill, every dependency lookup requires Bash commands with `$()` substitution that trigger "Do you want to proceed?" prompts. A single investigation can require 5–10 manual approvals. This skill eliminates that by pre-indexing everything into Grep-searchable plain text files.
 
@@ -50,6 +52,8 @@ public class ClassName extends Parent implements Interface {
 - Search by method name: `Grep pattern="methodName"` in `.depx/manifest/`
 - The `# PATH:` header in each .index file tells you which JAR contains the class
 
+**If the class is NOT found in the index:** The index may be stale or incomplete. **Do NOT fall back to `javap`/`find`/`jar`/`unzip`.** Instead, rebuild the index by running the **Index Build Procedure** below. After rebuilding, retry the Grep search.
+
 ## Phase 2: Read Decompiled Source (Read — no permission prompt)
 
 If you need the full implementation (not just signatures):
@@ -66,9 +70,11 @@ If the source directory does not exist for this artifact, proceed to Phase 3.
 
 ## Phase 3: Decompile on Demand (Bash — one-time cost)
 
+> **PREREQUISITE:** You MUST have a manifest entry for the artifact before decompiling. If you don't have one, go back and run the **Index Build Procedure** first. **NEVER** hardcode or guess JAR paths from `~/.gradle/caches` — the JAR path MUST come from a manifest `# PATH:` line.
+
 When decompiled source is needed but not yet cached:
 
-1. Find the JAR path from the manifest file (`# PATH:` line)
+1. Find the JAR path by reading the `# PATH:` line from the corresponding `.depx/manifest/<artifact>.index` file. If no manifest exists for this artifact → **stop and run Index Build Procedure first**.
 2. Ensure CFR decompiler exists:
    ```bash
    if [ ! -f .depx/tools/cfr.jar ]; then
@@ -79,7 +85,7 @@ When decompiled source is needed but not yet cached:
 3. Decompile the entire JAR (one-time, subsequent reads are free):
    ```bash
    ARTIFACT="<artifactId>"
-   JAR_PATH="<path from manifest>"
+   JAR_PATH="<path from manifest>"  # MUST come from .depx/manifest/*.index, NEVER hardcoded
    mkdir -p ".depx/source/$ARTIFACT"
    java -jar .depx/tools/cfr.jar "$JAR_PATH" --outputdir ".depx/source/$ARTIFACT" --silent true 2>/dev/null
    ```
