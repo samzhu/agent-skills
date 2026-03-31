@@ -42,6 +42,13 @@
       "source": "./",
       "strict": false,
       "skills": ["./skills/ui-craft"]
+    },
+    {
+      "name": "depx",
+      "description": "Explore JVM dependency source code by indexing and decompiling JAR files",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/depx"]
     }
   ]
 }

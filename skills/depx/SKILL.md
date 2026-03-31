@@ -1,15 +1,14 @@
 ---
 name: depx
 description: >-
-  Explore JVM dependency source code from .depx/ index. TRIGGER when: needing to
-  inspect a third-party class, method, or API; searching for classes in dependency
-  JARs; understanding how a library works internally; user asks about a class that
-  does not exist in project source code. DO NOT TRIGGER for project source code
-  that exists in the working directory.
+  ALWAYS use instead of find/javap/jar tf/jar xf on ~/.gradle or ~/.m2 caches.
+  TRIGGER when: inspecting third-party JVM class/method/API, searching dependency JARs,
+  extracting or decompiling JAR contents, reading library internals, or class not in project src.
+  DO NOT TRIGGER for project source code in working directory.
 allowed-tools: Bash, Read, Write, Glob, Grep
 metadata:
   author: samzhu
-  version: 0.1.0
+  version: 0.2.0
   category: development
   tags: [java, jvm, dependency, decompile, gradle, maven]
 ---
@@ -20,11 +19,13 @@ You are an AI agent that needs to explore JVM dependency source code. Follow the
 
 ## Priority Rules (NEVER violate)
 
-1. **NEVER** run `find ~/.gradle/caches`, `find ~/.m2`, or scan local repository caches directly
+1. **NEVER** run `find ~/.gradle/caches`, `find ~/.m2`, `jar tf`, `jar xf`, `javap`, or any Bash command to scan, extract, or inspect local repository caches directly — these trigger repeated permission prompts and are slow. **NEVER** extract JARs to `/tmp` or any temporary directory. This applies to **ALL phases** including index building — use the build tool (Gradle/Maven) to resolve classpath, not `find`.
 2. **ALWAYS** check `.depx/manifest/` first using the Grep tool (no Bash needed, no permission prompt)
 3. **ALWAYS** check `.depx/source/` for decompiled code using the Read tool (no Bash needed)
-4. If `.depx/manifest/` does not exist or is empty → run the **Index Build** procedure below
+4. If `.depx/manifest/` does not exist or is empty → run the **Index Build** procedure below (which uses Gradle/Maven, NOT `find`)
 5. If decompiled source is needed but missing → run the **Decompile** procedure below
+
+> **Why this matters:** Without this skill, every dependency lookup requires Bash commands with `$()` substitution that trigger "Do you want to proceed?" prompts. A single investigation can require 5–10 manual approvals. This skill eliminates that by pre-indexing everything into Grep-searchable plain text files.
 
 ## Phase 1: Search the Index (Grep — no permission prompt)
 
@@ -88,9 +89,11 @@ When decompiled source is needed but not yet cached:
 
 If `.depx/manifest/` does not exist or is empty, build the index automatically.
 
-### Step 1: Resolve Classpath
+> **CRITICAL:** You MUST follow Steps 1→2→3 in order. Do NOT skip Step 1 and manually `find` individual JARs. Do NOT construct manifest files by hand-crafting `find ~/.gradle/caches` commands for each dependency. The correct approach is to resolve the **full classpath at once** using the build tool (Gradle or Maven), then generate manifests from that list.
 
-Detect the build tool and extract dependency JAR paths.
+### Step 1: Resolve Classpath (MANDATORY — do NOT skip)
+
+Use the project's build tool to resolve all dependency JAR paths at once. **NEVER** use `find` to locate JARs individually.
 
 **For Gradle projects** (build.gradle or build.gradle.kts exists):
 
