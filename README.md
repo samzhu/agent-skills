@@ -21,6 +21,8 @@ claude plugin install springboot-config-organizer@samzhu-agent-skills
 claude plugin install research@samzhu-agent-skills
 claude plugin install ui-craft@samzhu-agent-skills
 claude plugin install depx@samzhu-agent-skills
+claude plugin install handover@samzhu-agent-skills
+claude plugin install takeover@samzhu-agent-skills
 ```
 
 ## Skills
@@ -33,6 +35,8 @@ claude plugin install depx@samzhu-agent-skills
 | **research** | Research development topics and produce structured tutorial documents |
 | **ui-craft** | Intentional UI design with craft quality, not defaults |
 | **depx** | Explore JVM dependency source code by indexing and decompiling JAR files |
+| **handover** | Save session context as a structured note for any agent or human to resume |
+| **takeover** | Read a handover note, archive it, and resume work seamlessly |
 
 ## Usage
 
@@ -82,6 +86,18 @@ Each of these commands triggers a permission prompt ("Command contains `$()` com
 Depx solves this by building a local `.depx/` index once (manifest files searchable via Grep with no permission prompt), and decompiling JARs on demand. After the one-time setup, most lookups require **zero Bash commands and zero permission prompts**.
 
 Indexes JVM dependency JARs and lets you search class signatures or decompile full source code on demand. Supports both Gradle and Maven projects.
+
+### Handover
+
+Trigger words: `handover`, `交班`, `換手`, `shift change`, `save progress`, `wrap up session`, `pass the baton`, `先到這裡`, `存檔`
+
+Generates a structured `.claude/handovers/HANDOVER.md` with two layers: a portable summary (readable by any agent or human) and environment details (git state, key files). The note is designed to be agent-agnostic — Claude, Gemini, Copilot, or a human can all pick it up.
+
+### Takeover
+
+Trigger words: `takeover`, `接班`, `pick up where we left off`, `resume handover`, `continue from last session`, `read handover`
+
+Reads the handover note, presents a structured briefing (what was done, key decisions, blockers, action plan), archives the consumed note to `.claude/handovers/archive/`, and waits for confirmation before starting work.
 
 ## Example
 

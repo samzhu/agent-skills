@@ -25,7 +25,6 @@ You are an AI agent that needs to explore JVM dependency source code. Follow the
 4. If `.depx/manifest/` does not exist, is empty, or **does not contain the class/library you need** → run the **Index Build** procedure below (which uses Gradle/Maven, NOT `find`). An outdated or incomplete index is NOT an excuse to fall back to `javap`/`find`/`jar` commands.
 5. If decompiled source is needed but missing → run the **Decompile** procedure below
 6. **There is NO fallback.** If the index doesn't have what you need, rebuild it. NEVER bypass this skill's procedures by running cache commands directly, even if the index is stale or incomplete.
-7. **NEVER delegate dependency lookups to Agent subagents (Explore, Plan, general-purpose).** Subagents do NOT have access to this skill's rules and will fall back to `find ~/.gradle/caches`. Always perform dependency inspection in the main conversation context where this skill is active.
 
 > **Why this matters:** Without this skill, every dependency lookup requires Bash commands with `$()` substitution that trigger "Do you want to proceed?" prompts. A single investigation can require 5–10 manual approvals. This skill eliminates that by pre-indexing everything into Grep-searchable plain text files.
 

@@ -21,6 +21,8 @@ claude plugin install springboot-config-organizer@samzhu-agent-skills
 claude plugin install research@samzhu-agent-skills
 claude plugin install ui-craft@samzhu-agent-skills
 claude plugin install depx@samzhu-agent-skills
+claude plugin install handover@samzhu-agent-skills
+claude plugin install takeover@samzhu-agent-skills
 ```
 
 ## Skills 清單
@@ -33,6 +35,8 @@ claude plugin install depx@samzhu-agent-skills
 | **research** | 研究開發主題並產出結構化教學文件 |
 | **ui-craft** | 刻意的 UI 設計，追求工藝品質而非預設值 |
 | **depx** | 探索 JVM 依賴套件原始碼，索引並反編譯 JAR 檔案 |
+| **handover** | 將 session 上下文儲存為結構化筆記，讓任何 agent 或人類接手 |
+| **takeover** | 讀取交班筆記、歸檔、呈報摘要，無縫接續工作 |
 
 ## 使用方式
 
@@ -82,6 +86,35 @@ JAR=$(find ~/.gradle/caches -name "some-lib-0.10.0.jar" 2>/dev/null | head -1) \
 Depx 的解法是一次性建立本地 `.depx/` 索引（manifest 檔案可透過 Grep 工具搜尋，不需要權限提示），並按需反編譯 JAR。初次設定完成後，大部分查詢**完全不需要 Bash 指令，也不會跳出任何權限提示**。
 
 索引 JVM 依賴套件的 JAR 檔案，可搜尋類別簽章或按需反編譯完整原始碼。支援 Gradle 與 Maven 專案。
+
+### Handover（交班）
+
+觸發詞：`handover`、`交班`、`換手`、`shift change`、`save progress`、`wrap up session`、`pass the baton`、`先到這裡`、`存檔`
+
+**為什麼需要這個 skill：** Claude Code 的 session 有 context 上限，對話越長越容易遺失早期的細節。當你要結束工作、切換到另一個 session、或 context 快滿的時候，需要一個方法把進度「存檔」。
+
+Handover 會自動掃描整段對話歷史，產出一份結構化的 `.claude/handovers/HANDOVER.md`，分成兩層：
+
+| 層 | 內容 | 誰能讀 |
+|----|------|--------|
+| **Layer 1 — 通用摘要** | 主題、狀態、完成項目、決策（含被否決的替代方案）、blockers、下一步、踩坑紀錄 | 任何 agent 或人類 |
+| **Layer 2 — 環境細節** | git branch、未提交的檔案、最近 commit、測試狀態、相關檔案 | 同一台機器/同一個 repo |
+
+根據 session 類型（development / debug / research / refactor / planning）自動調整重點深度。例如 debug session 會特別詳細記錄「試過什麼、為什麼失敗」，避免下個人重踩同樣的坑。
+
+### Takeover（接班）
+
+觸發詞：`takeover`、`接班`、`pick up where we left off`、`resume handover`、`continue from last session`、`read handover`
+
+**為什麼需要這個 skill：** 開啟新 session 時，你面對的是一個完全沒有上下文的 agent。沒有 takeover 的話，你得自己口述「上次做到哪裡」，既費時又容易漏掉細節。
+
+Takeover 會自動讀取 `/handover` 留下的筆記，然後：
+
+1. 呈報結構化摘要（做了什麼、關鍵決策、blockers、行動計畫）
+2. 歸檔已消費的筆記到 `.claude/handovers/archive/`（防止重複讀取）
+3. 等你確認後才開始動工
+
+這對 skill 是 **agent-agnostic** 的 — Layer 1 的格式設計讓 Claude、Gemini、Copilot 或人類都能讀懂。
 
 ## 範例
 
