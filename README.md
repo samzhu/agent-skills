@@ -23,6 +23,7 @@ claude plugin install ui-craft@samzhu-agent-skills
 claude plugin install depx@samzhu-agent-skills
 claude plugin install handover@samzhu-agent-skills
 claude plugin install takeover@samzhu-agent-skills
+claude plugin install retro@samzhu-agent-skills
 ```
 
 ## Skills
@@ -37,6 +38,7 @@ claude plugin install takeover@samzhu-agent-skills
 | **depx** | Explore JVM dependency source code by indexing and decompiling JAR files |
 | **handover** | Save session context as a structured note for any agent or human to resume |
 | **takeover** | Read a handover note, archive it, and resume work seamlessly |
+| **retro** | Evidence-based retrospective that produces a reusable trigger-action checklist |
 
 ## Usage
 
@@ -87,17 +89,33 @@ Depx solves this by building a local `.depx/` index once (manifest files searcha
 
 Indexes JVM dependency JARs and lets you search class signatures or decompile full source code on demand. Supports both Gradle and Maven projects.
 
-### Handover
+### Handover & Takeover
+
+<p align="center">
+  <img src="images/handover-takeover.png" alt="Handover & Takeover flow diagram" width="600" />
+</p>
+
+#### Handover
 
 Trigger words: `handover`, `交班`, `換手`, `shift change`, `save progress`, `wrap up session`, `pass the baton`, `先到這裡`, `存檔`
 
 Generates a structured `.claude/handovers/HANDOVER.md` with two layers: a portable summary (readable by any agent or human) and environment details (git state, key files). The note is designed to be agent-agnostic — Claude, Gemini, Copilot, or a human can all pick it up.
 
-### Takeover
+#### Takeover
 
 Trigger words: `takeover`, `接班`, `pick up where we left off`, `resume handover`, `continue from last session`, `read handover`
 
 Reads the handover note, presents a structured briefing (what was done, key decisions, blockers, action plan), archives the consumed note to `.claude/handovers/archive/`, and waits for confirmation before starting work.
+
+### Retro
+
+<p align="center">
+  <img src="images/retro.png" alt="Retro flow diagram" width="600" />
+</p>
+
+Trigger words: `retro`, `retrospective`, `lessons learned`, `what went wrong`, `post-mortem`, `review this session`, `what could be improved`
+
+Produces an evidence-grounded retrospective with a 7-step protocol: turning points ledger, 5 Whys with evidence, root cause selection, counterfactual analysis, trigger-action checklist, human feedback, and artifact persistence. The main deliverable is a reusable trigger-action checklist that auto-triggers in future sessions.
 
 ## Example
 

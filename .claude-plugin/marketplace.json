@@ -49,6 +49,27 @@
       "source": "./",
       "strict": false,
       "skills": ["./skills/depx"]
+    },
+    {
+      "name": "handover",
+      "description": "Save session context as a structured note for any agent or human to resume",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/handover"]
+    },
+    {
+      "name": "takeover",
+      "description": "Read a handover note, archive it, and resume work seamlessly",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/takeover"]
+    },
+    {
+      "name": "retro",
+      "description": "Evidence-based retrospective that produces a reusable trigger-action checklist",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/retro"]
     }
   ]
 }
