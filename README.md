@@ -92,7 +92,7 @@ Indexes JVM dependency JARs and lets you search class signatures or decompile fu
 ### Handover & Takeover
 
 <p align="center">
-  <img src="images/handover-takeover.jpg" alt="Handover & Takeover flow diagram" width="600" />
+  <img src="images/handover-takeover-en.jpg" alt="Handover & Takeover flow diagram" width="600" />
 </p>
 
 #### Handover
@@ -110,7 +110,7 @@ Reads the handover note, presents a structured briefing (what was done, key deci
 ### Retro
 
 <p align="center">
-  <img src="images/retro.jpg" alt="Retro flow diagram" width="600" />
+  <img src="images/retro-en.jpg" alt="Retro flow diagram" width="600" />
 </p>
 
 Trigger words: `retro`, `retrospective`, `lessons learned`, `what went wrong`, `post-mortem`, `review this session`, `what could be improved`
